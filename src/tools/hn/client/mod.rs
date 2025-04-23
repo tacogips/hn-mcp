@@ -20,6 +20,12 @@ impl Clone for HnClient {
     }
 }
 
+impl Default for HnClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HnClient {
     pub fn new() -> Self {
         Self {

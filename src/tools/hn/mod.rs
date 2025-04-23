@@ -1,13 +1,5 @@
-use std::sync::Arc;
-use std::time::{Duration, Instant};
-
-use anyhow::{anyhow, Result};
-use reqwest::Client;
-use serde::{Deserialize, Serialize};
-use std::fmt;
-use std::str::FromStr;
-use tokio::sync::Mutex;
-use tracing::{debug, error, info};
+use anyhow::Result;
+use tracing::info;
 
 use rmcp::{model::*, schemars, tool, ServerHandler};
 
@@ -42,7 +34,7 @@ impl HnRouter {
         chunk_size: Option<usize>,
     ) -> String {
         let count = count.unwrap_or(10).min(30);
-        let chunk_size = chunk_size.unwrap_or(5).min(10).max(1);
+        let chunk_size = chunk_size.unwrap_or(5).clamp(1, 10);
 
         match self
             .get_hacker_news_stories(count, chunk_size, |client, limit| async move {
@@ -67,7 +59,7 @@ impl HnRouter {
         chunk_size: Option<usize>,
     ) -> String {
         let count = count.unwrap_or(10).min(30);
-        let chunk_size = chunk_size.unwrap_or(5).min(10).max(1);
+        let chunk_size = chunk_size.unwrap_or(5).clamp(1, 10);
 
         match self
             .get_hacker_news_stories(count, chunk_size, |client, limit| async move {
@@ -92,7 +84,7 @@ impl HnRouter {
         chunk_size: Option<usize>,
     ) -> String {
         let count = count.unwrap_or(10).min(30);
-        let chunk_size = chunk_size.unwrap_or(5).min(10).max(1);
+        let chunk_size = chunk_size.unwrap_or(5).clamp(1, 10);
 
         match self
             .get_hacker_news_stories(count, chunk_size, |client, limit| async move {
@@ -117,7 +109,7 @@ impl HnRouter {
         chunk_size: Option<usize>,
     ) -> String {
         let count = count.unwrap_or(10).min(30);
-        let chunk_size = chunk_size.unwrap_or(5).min(10).max(1);
+        let chunk_size = chunk_size.unwrap_or(5).clamp(1, 10);
 
         match self
             .get_hacker_news_stories(count, chunk_size, |client, limit| async move {
@@ -142,7 +134,7 @@ impl HnRouter {
         chunk_size: Option<usize>,
     ) -> String {
         let count = count.unwrap_or(10).min(30);
-        let chunk_size = chunk_size.unwrap_or(5).min(10).max(1);
+        let chunk_size = chunk_size.unwrap_or(5).clamp(1, 10);
 
         match self
             .get_hacker_news_stories(count, chunk_size, |client, limit| async move {
@@ -207,7 +199,7 @@ impl HnRouter {
 
         let formatted_stories = sorted_stories
             .iter()
-            .map(|story| client::HnClient::format_story(story))
+            .map(client::HnClient::format_story)
             .collect::<Vec<_>>()
             .join("\n---\n");
 
