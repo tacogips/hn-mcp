@@ -2,68 +2,107 @@
 
 ## Overview
 
-model context protocol to hacker new https://news.ycombinator.com/
+Model Context Protocol (MCP) interface to Hacker News (https://news.ycombinator.com/)
 
-/v0/topstories
-/v0/newstories
-/v0/beststories
+API endpoints used:
+- /v0/topstories
+- /v0/newstories
+- /v0/beststories
+- /v0/askstories
+- /v0/showstories
 
-using rust sdk https://github.com/JoeyMckenzie/newswrap/
+This MCP uses the Rust SDK: https://github.com/JoeyMckenzie/newswrap/
 
-## docs
+## Documentation
 
-### hacker news api spec
+### Hacker News API Specification
 
 https://github.com/HackerNews/API
 
-## dependency
+## Dependencies
 
-### hacker news client
+### Hacker News Client
 
-github: https://github.com/JoeyMckenzie/newswrap/
-crate: https://crates.io/crates/newswrap
+- GitHub: https://github.com/JoeyMckenzie/newswrap/
+- Crate: https://crates.io/crates/newswrap
 
-the source code is cloned at hn-mcp/newswrap so you can refer the all of the sources if needed
+The source code is cloned at hn-mcp/newswrap so you can refer to all of the sources if needed.
 
-storiesのidの取得は
-HackerNewsRealtimeClient の
+## Implementation Details
 
-```
-  pub async fn get_top_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
-  self.get_realtime_story_data(TOP_STORIES_ENDPOINT).await
-  }
+### Story ID Retrieval
 
-    pub async fn get_latest_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
-        self.get_realtime_story_data(NEW_STORIES_ENDPOINT).await
-    }
+Story IDs are retrieved using `HackerNewsRealtimeClient`:
 
-    pub async fn get_best_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
-        self.get_realtime_story_data(BEST_STORIES_ENDPOINT).await
-    }
+```rust
+pub async fn get_top_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
+    self.get_realtime_story_data(TOP_STORIES_ENDPOINT).await
+}
 
-    pub async fn get_ask_hacker_news_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
-        self.get_realtime_story_data(ASK_STORIES_ENDPOINT).await
-    }
+pub async fn get_latest_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
+    self.get_realtime_story_data(NEW_STORIES_ENDPOINT).await
+}
 
-    pub async fn get_show_hacker_news_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
-        self.get_realtime_story_data(SHOW_STORIES_ENDPOINT).await
-    }
+pub async fn get_best_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
+    self.get_realtime_story_data(BEST_STORIES_ENDPOINT).await
+}
 
-```
+pub async fn get_ask_hacker_news_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
+    self.get_realtime_story_data(ASK_STORIES_ENDPOINT).await
+}
 
-を使用する。
-
-そのidからstoryのcontentsを取得するには、
-
-HackerNewsItemClient の
-
-```
-    /// Retrieves a story from Hacker News, returning errors if the item was not a valid story type.
-    pub async fn get_story(&self, id: HackerNewsID) -> HackerNewsResult<HackerNewsStory> {
-        self.get_typed_item(id).await
-    }
+pub async fn get_show_hacker_news_stories(&self) -> HackerNewsResult<HackerNewsItemList> {
+    self.get_realtime_story_data(SHOW_STORIES_ENDPOINT).await
+}
 ```
 
-を使用して行う。
+### Story Content Retrieval
 
-複数のnews idをtokioでconcurrentに取得する。複数のnews idをchunkに分けて(default 5) それぞれを同時に取得する。
+Story contents are retrieved from IDs using `HackerNewsItemClient`:
+
+```rust
+/// Retrieves a story from Hacker News, returning errors if the item was not a valid story type.
+pub async fn get_story(&self, id: HackerNewsID) -> HackerNewsResult<HackerNewsStory> {
+    self.get_typed_item(id).await
+}
+```
+
+### Concurrency Model
+
+Multiple news IDs are retrieved concurrently using Tokio. The process:
+1. News IDs are divided into chunks (default 5, max 10, min 1)
+2. Each chunk is processed concurrently
+3. The `chunk_size` parameter is clamped using Rust's `clamp()` method:
+   ```rust
+   let chunk_size = chunk_size.unwrap_or(5).clamp(1, 10);
+   ```
+
+### HnClient Implementation
+
+The `HnClient` implements the `Default` trait for better ergonomics:
+
+```rust
+impl Default for HnClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl HnClient {
+    pub fn new() -> Self {
+        Self {
+            client: Arc::new(HackerNewsClient::new()),
+        }
+    }
+}
+```
+
+## Tool Methods
+
+The MCP exposes the following tool methods:
+- `hn_top_stories`: Retrieves the top stories from Hacker News
+- `hn_latest_stories`: Retrieves the latest stories from Hacker News
+- `hn_best_stories`: Retrieves the best stories from Hacker News
+- `hn_ask_stories`: Retrieves Ask HN stories from Hacker News
+- `hn_show_stories`: Retrieves Show HN stories from Hacker News
+- `hn_story_by_id`: Retrieves story details by ID from Hacker News
