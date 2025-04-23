@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
 use tokio::sync::Mutex;
+use tracing::{debug, error, info};
 
 use rmcp::{model::*, schemars, tool, ServerHandler};
 
@@ -397,12 +398,22 @@ struct HnDescription {
     descriptions: std::collections::HashMap<String, String>,
 }
 
-#[derive(Clone)]
 pub struct HnRouter {
     pub client: Client,
     rate_limiter: RateLimiter,
     api_key: String,
     hn_client: client::HnClient,
+}
+
+impl Clone for HnRouter {
+    fn clone(&self) -> Self {
+        Self {
+            client: self.client.clone(),
+            rate_limiter: self.rate_limiter.clone(),
+            api_key: self.api_key.clone(),
+            hn_client: self.hn_client.clone(),
+        }
+    }
 }
 
 impl HnRouter {
@@ -1049,21 +1060,33 @@ impl HnRouter {
     // Helper method to fetch stories using different strategies
     async fn get_hacker_news_stories<F, Fut>(&self, count: usize, chunk_size: usize, get_ids: F) -> Result<String>
     where
-        F: FnOnce(&client::HnClient, usize) -> Fut,
+        F: FnOnce(client::HnClient, usize) -> Fut,
         Fut: std::future::Future<Output = Result<Vec<u32>>>,
     {
-        // Get the story IDs
-        let story_ids = get_ids(&self.hn_client, count).await?;
+        // Get the story IDs from the specified endpoint
+        let story_ids = get_ids(self.hn_client.clone(), count).await?;
+        info!("Retrieved {} story IDs", story_ids.len());
         
-        // Fetch full details for each story
+        if story_ids.is_empty() {
+            return Ok("No stories found".to_string());
+        }
+        
+        // Fetch full details for each story using concurrent processing
         let stories = self.hn_client.get_stories_details(story_ids, Some(chunk_size)).await?;
+        info!("Fetched details for {} stories", stories.len());
         
         // Format the results
         if stories.is_empty() {
             return Ok("No stories found".to_string());
         }
         
-        let formatted_stories = stories
+        // Sort stories by score in descending order
+        let mut sorted_stories = stories;
+        sorted_stories.sort_by(|a, b| {
+            b.score.cmp(&a.score) // Descending order
+        });
+        
+        let formatted_stories = sorted_stories
             .iter()
             .map(|story| client::HnClient::format_story(story))
             .collect::<Vec<_>>()

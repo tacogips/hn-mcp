@@ -46,6 +46,8 @@ html2md = "0.2.14"
 temp-dir = { git = "https://gitlab.com/leonhard-llc/ops.git", branch = "main" }
 tokio-test = "0.4.4"
 newswrap = "0.1.6"
+chrono = "0.4"
+futures-util = "0.3"
 
 [dev-dependencies]
 # Testing utilities
