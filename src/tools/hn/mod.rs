@@ -218,9 +218,3 @@ impl ServerHandler for HnRouter {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    use super::*;
-}
