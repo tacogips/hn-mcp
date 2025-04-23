@@ -50,7 +50,7 @@ In this project, the term "documentation" or "project documentation" refers to t
 
 When asked to update "documentation", you should check and update all of these documentation sources for consistency.
 
-### Rule of Thumb
+### Generating Process
 
 You should think and output in English
 
@@ -63,6 +63,7 @@ When making significant changes to the codebase:
 3. Run linting with `cargo clippy`
 4. Format code with `cargo fmt`
 5. **Document your changes in devlog.md**
+6. **Document your changes in spec.md**
 
 ### Documenting in devlog.md
 
