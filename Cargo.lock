@@ -419,6 +419,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b42b6fa04a440b495c8b04d0e71b707c585f83cb9cb28cf8cd0d976c315e31b4"
 dependencies = [
  "powerfmt",
+ "serde",
 ]
 
 [[package]]
@@ -698,6 +699,7 @@ dependencies = [
  "html2md",
  "hyper 0.14.32",
  "mockito",
+ "newswrap",
  "rand 0.8.5",
  "reqwest",
  "rmcp",
@@ -1268,6 +1270,19 @@ name = "new_debug_unreachable"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
+
+[[package]]
+name = "newswrap"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed970f8a3d05ee68d119a6c7ce037eb151eeec050e31c0ef5562a5e115c500d8"
+dependencies = [
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "time",
+]
 
 [[package]]
 name = "nu-ansi-term"
