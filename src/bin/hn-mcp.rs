@@ -1,6 +1,6 @@
 use anyhow::Result;
-use hn_mcp::tools::HnRouter;
 use clap::{Parser, Subcommand};
+use hn_mcp::tools::{hn::client::HnClient, HnRouter};
 use std::net::SocketAddr;
 use tracing_subscriber::{self, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
@@ -9,10 +9,6 @@ use tracing_subscriber::{self, layer::SubscriberExt, util::SubscriberInitExt, En
 #[command(propagate_version = true)]
 #[command(disable_version_flag = true)]
 struct Cli {
-    /// HN API key, required via HN_API_KEY environment variable or --api-key flag
-    #[arg(short, long, env = "HN_API_KEY", required = true)]
-    api_key: String,
-
     #[command(subcommand)]
     command: Commands,
 }
@@ -40,15 +36,14 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
-    let api_key = cli.api_key;
 
     match cli.command {
-        Commands::Stdio { debug } => run_stdio_server(api_key, debug).await,
-        Commands::Http { address, debug } => run_http_server(api_key, address, debug).await,
+        Commands::Stdio { debug } => run_stdio_server(debug).await,
+        Commands::Http { address, debug } => run_http_server(address, debug).await,
     }
 }
 
-async fn run_stdio_server(api_key: String, debug: bool) -> Result<()> {
+async fn run_stdio_server(debug: bool) -> Result<()> {
     // Initialize the tracing subscriber with stderr logging
     let level = if debug {
         tracing::Level::DEBUG
@@ -69,12 +64,12 @@ async fn run_stdio_server(api_key: String, debug: bool) -> Result<()> {
     tracing::info!("Starting HN MCP server in STDIN/STDOUT mode");
 
     // Run the server using the implementation
-    hn_mcp::transport::stdio::run_stdio_server(api_key)
+    hn_mcp::transport::stdio::run_stdio_server()
         .await
         .map_err(|e| anyhow::anyhow!("Error running STDIO server: {}", e))
 }
 
-async fn run_http_server(api_key: String, address: String, debug: bool) -> Result<()> {
+async fn run_http_server(address: String, debug: bool) -> Result<()> {
     // Setup tracing
     let level = if debug { "debug" } else { "info" };
 
@@ -90,13 +85,10 @@ async fn run_http_server(api_key: String, address: String, debug: bool) -> Resul
     let addr: SocketAddr = address.parse()?;
 
     tracing::debug!("HN MCP Server listening on {}", addr);
-    tracing::info!(
-        "Access the HN MCP Server at http://{}/sse",
-        addr
-    );
+    tracing::info!("Access the HN MCP Server at http://{}/sse", addr);
 
     // Create and run server
-    let service = HnRouter::new(api_key);
+    let service = HnRouter::new(HnClient::new());
     let server = hn_mcp::transport::sse_server::serve(service, addr.port())
         .await
         .map_err(|e| anyhow::anyhow!("Error starting SSE server: {}", e))?;
