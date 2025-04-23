@@ -1,4 +1,4 @@
-# Brave Search MCP Specification
+# HN Search MCP Specification
 
 ## Overview
 

@@ -1,5 +1,5 @@
 {
-  description = "bravesearch-mcp-forked";
+  description = "hn-mcp";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
@@ -66,7 +66,7 @@
 
         # Simple package definition
         packages.default = buildRustPackageCustom {
-          pname = "bravesearch-mcp";
+          pname = "hn-mcp";
           version = "0.1.0";
           src = ./.;
 

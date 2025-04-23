@@ -1,11 +1,11 @@
 [package]
-name = "bravesearch-mcp"
+name = "hn-mcp"
 version = "0.1.0"
 edition = "2021"
-description = "Rust Documentation MCP Server for LLM crate assistance"
+description = "Hacker News MCP Server for LLM crate assistance"
 authors = ["Claude <noreply@anthropic.com>"]
 license = "MIT"
-repository = "https://github.com/d6e/bravesearch-mcp"
+repository = "https://github.com/d6e/hn-mcp"
 
 [workspace]
 members = ["."]
@@ -52,5 +52,5 @@ mockito = "1.2"
 
 # Main binary with subcommands
 [[bin]]
-name = "bravesearch-mcp"
-path = "src/bin/bravesearch-mcp.rs"
+name = "hn-mcp"
+path = "src/bin/hn-mcp.rs"

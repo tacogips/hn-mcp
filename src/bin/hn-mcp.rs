@@ -1,16 +1,16 @@
 use anyhow::Result;
-use bravesearch_mcp::tools::BraveSearchRouter;
+use hn_mcp::tools::HnRouter;
 use clap::{Parser, Subcommand};
 use std::net::SocketAddr;
 use tracing_subscriber::{self, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 #[derive(Parser)]
-#[command(author, version = "0.1.0", about = "Brave Search MCP Server", long_about = None)]
+#[command(author, version = "0.1.0", about = "HN MCP Server", long_about = None)]
 #[command(propagate_version = true)]
 #[command(disable_version_flag = true)]
 struct Cli {
-    /// Brave API key, required via BRAVE_API_KEY environment variable or --api-key flag
-    #[arg(short, long, env = "BRAVE_API_KEY", required = true)]
+    /// HN API key, required via HN_API_KEY environment variable or --api-key flag
+    #[arg(short, long, env = "HN_API_KEY", required = true)]
     api_key: String,
 
     #[command(subcommand)]
@@ -66,10 +66,10 @@ async fn run_stdio_server(api_key: String, debug: bool) -> Result<()> {
         .with_ansi(false) // Disable ANSI color codes
         .init();
 
-    tracing::info!("Starting Brave Search MCP server in STDIN/STDOUT mode");
+    tracing::info!("Starting HN MCP server in STDIN/STDOUT mode");
 
     // Run the server using the implementation
-    bravesearch_mcp::transport::stdio::run_stdio_server(api_key)
+    hn_mcp::transport::stdio::run_stdio_server(api_key)
         .await
         .map_err(|e| anyhow::anyhow!("Error running STDIO server: {}", e))
 }
@@ -89,15 +89,15 @@ async fn run_http_server(api_key: String, address: String, debug: bool) -> Resul
     // Parse socket address
     let addr: SocketAddr = address.parse()?;
 
-    tracing::debug!("Brave Search MCP Server listening on {}", addr);
+    tracing::debug!("HN MCP Server listening on {}", addr);
     tracing::info!(
-        "Access the Brave Search MCP Server at http://{}/sse",
+        "Access the HN MCP Server at http://{}/sse",
         addr
     );
 
     // Create and run server
-    let service = BraveSearchRouter::new(api_key);
-    let server = bravesearch_mcp::transport::sse_server::serve(service, addr.port())
+    let service = HnRouter::new(api_key);
+    let server = hn_mcp::transport::sse_server::serve(service, addr.port())
         .await
         .map_err(|e| anyhow::anyhow!("Error starting SSE server: {}", e))?;
 

@@ -1,3 +1,3 @@
-pub mod bravesearch;
+pub mod hn;
 
-pub use bravesearch::BraveSearchRouter;
+pub use hn::HnRouter;
