@@ -13,6 +13,14 @@ When making significant changes to the codebase:
 
 ## Recent Changes
 
+### 2025-04-24: Performance Improvements - Added LRU Cache for Story Retrieval
+
+- Implemented LRU cache for Hacker News stories to reduce API requests:
+  - Added lru-rs crate for efficient caching
+  - Created CachedStory wrapper to store story data
+  - Modified story retrieval process to check cache before making API calls
+  - Added cache hit/miss logging for monitoring performance
+
 ### 2025-04-24: Code Quality Improvements
 
 - Fixed Clippy warnings throughout the codebase:
