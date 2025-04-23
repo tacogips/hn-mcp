@@ -1,0 +1,53 @@
+# Development Log
+
+This file tracks the development history, design decisions, and implementation details of the HN MCP project.
+
+## How to use this file
+
+When making significant changes to the codebase:
+
+1. Document your changes in the appropriate section below
+2. Add a new entry in the "Recent Changes" section with today's date and a summary
+3. Be detailed about design decisions, implementation choices, and reasons behind them
+4. Include any challenges faced and how they were overcome
+
+## Recent Changes
+
+### 2025-04-24: Code Quality Improvements
+
+- Fixed Clippy warnings throughout the codebase:
+  - Removed unused imports in `src/tools/hn/mod.rs`
+  - Replaced manual `min/max` clamping with `clamp()` method for cleaner code
+  - Added `Default` implementation for `HnClient`
+  - Simplified redundant closure in map function
+
+## Architecture
+
+The HN MCP follows a clean architecture pattern with the following components:
+
+- Client layer: Handles communication with the Hacker News API
+- Router layer: Routes MCP requests to appropriate handlers
+- Server layer: Manages the MCP protocol and communication
+
+## Implementation Details
+
+### Hacker News Client
+
+The HnClient is implemented as a wrapper around the newswrap crate's HackerNewsClient.
+It provides methods to:
+
+- Fetch various story categories (top, latest, best, ask, show)
+- Get story details by ID
+- Process stories in parallel batches for better performance
+
+### Concurrency Model
+
+We use Tokio for asynchronous processing and concurrent fetching of story details.
+Stories are processed in configurable chunks (default 5, max 10) to avoid overwhelming the API.
+
+## Future Improvements
+
+- Add caching to reduce API calls for frequently requested stories
+- Implement pagination for large result sets
+- Add error retry logic for transient API failures
+- Expand test coverage for edge cases
