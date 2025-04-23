@@ -77,6 +77,28 @@ Multiple news IDs are retrieved concurrently using Tokio. The process:
    let chunk_size = chunk_size.unwrap_or(5).clamp(1, 10);
    ```
 
+### Caching
+
+A local LRU (Least Recently Used) cache is implemented to reduce API requests:
+1. The lru-rs crate is used for efficient caching
+2. Story details are cached with a default capacity of 100 items
+3. When fetching story details, the cache is checked first before making API requests
+4. Cache hits/misses are logged for performance monitoring
+5. If a story is not in the cache, it is fetched from the API and then stored in the cache
+6. A custom wrapper type `CachedStory` is used to store cloneable story data since `HackerNewsStory` does not implement `Clone`
+   ```rust
+   #[derive(Debug, Clone)]
+   struct CachedStory {
+       id: HackerNewsID,
+       title: String,
+       url: String, 
+       text: String,
+       by: String,
+       score: u32,
+       // other fields...
+   }
+   ```
+
 ### HnClient Implementation
 
 The `HnClient` implements the `Default` trait for better ergonomics:
