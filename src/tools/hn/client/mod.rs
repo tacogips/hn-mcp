@@ -272,21 +272,21 @@ impl HnClient {
 
     // Format a story into a readable string
     pub fn format_story(story: &HackerNewsStory) -> String {
-        // URLが空でない場合に表示
+        // Display URL if it's not empty
         let url_section = if !story.url.is_empty() {
             format!("URL: {}\n", story.url)
         } else {
             String::new()
         };
 
-        // テキストが空でない場合に表示
+        // Display text if it's not empty
         let text_section = if !story.text.is_empty() {
             format!("Text: {}\n", story.text)
         } else {
             String::new()
         };
 
-        // created_atを文字列にフォーマット
+        // Format created_at to string
         let created_at = &story.created_at;
         let date_time = format!("{}", created_at);
 

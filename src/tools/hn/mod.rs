@@ -22,7 +22,7 @@ impl HnRouter {
     pub fn new(hn_client: client::HnClient) -> Self {
         Self { hn_client }
     }
-    #[tool(description = "Retrieves the top stories from Hacker News with their details.")]
+    #[tool(description = "Retrieves the top stories from Hacker News (HN) with their details.")]
     async fn hn_top_stories(
         &self,
         #[tool(param)]
@@ -47,7 +47,7 @@ impl HnRouter {
         }
     }
 
-    #[tool(description = "Retrieves the latest stories from Hacker News with their details.")]
+    #[tool(description = "Retrieves the latest stories from Hacker News (HN) with their details.")]
     async fn hn_latest_stories(
         &self,
         #[tool(param)]
@@ -72,7 +72,7 @@ impl HnRouter {
         }
     }
 
-    #[tool(description = "Retrieves the best stories from Hacker News with their details.")]
+    #[tool(description = "Retrieves the best stories from Hacker News (HN) with their details.")]
     async fn hn_best_stories(
         &self,
         #[tool(param)]
@@ -97,7 +97,7 @@ impl HnRouter {
         }
     }
 
-    #[tool(description = "Retrieves Ask HN stories from Hacker News with their details.")]
+    #[tool(description = "Retrieves Ask HN stories from Hacker News (HN) with their details.")]
     async fn hn_ask_stories(
         &self,
         #[tool(param)]
@@ -122,7 +122,7 @@ impl HnRouter {
         }
     }
 
-    #[tool(description = "Retrieves Show HN stories from Hacker News with their details.")]
+    #[tool(description = "Retrieves Show HN stories from Hacker News (HN) with their details.")]
     async fn hn_show_stories(
         &self,
         #[tool(param)]
@@ -147,7 +147,7 @@ impl HnRouter {
         }
     }
 
-    #[tool(description = "Retrieves story details by ID from Hacker News.")]
+    #[tool(description = "Retrieves story details by ID from Hacker News (HN).")]
     async fn hn_story_by_id(
         &self,
         #[tool(param)]
