@@ -1,51 +1,38 @@
 # Hacker News MCP
 
-This is a Model Context Protocol (MCP) server that provides tools for accessing Hacker News data. It enables LLMs to search and retrieve content from Hacker News through a standardized interface.
+This is a Model Context Protocol (MCP) server that provides tools for accessing Hacker News data. It enables LLMs to retrieve content from Hacker News through a standardized interface.
 
 ## Features
 
-- **hn_web_search**: Perform web searches for Hacker News content
-- **hn_news_search**: Search for news articles on Hacker News with filtering options
-- **hn_local_search**: Find Hacker News discussions related to specific locations
-
-## Prerequisites
-
-You need a HN API key to use this server. You can obtain one by visiting the Hacker News API documentation.
+- **hn_top_stories**: Retrieves the top stories from Hacker News
+- **hn_latest_stories**: Retrieves the latest stories from Hacker News
+- **hn_best_stories**: Retrieves the best stories from Hacker News
+- **hn_ask_stories**: Retrieves Ask HN stories from Hacker News
+- **hn_show_stories**: Retrieves Show HN stories from Hacker News
+- **hn_story_by_id**: Retrieves story details by ID from Hacker News
 
 ## Installation
 
 ```bash
-git clone https://github.com/tacogips/hn-mcp.git
+git clone https://github.com/your-username/hn-mcp.git
 cd hn-mcp
 cargo build --release
 ```
 
 ## Running the Server
 
-There are two ways to provide your HN API key:
-
-1. Set it as an environment variable:
-   ```bash
-   export HN_API_KEY=your_api_key_here
-   ```
-
-2. Provide it directly as a command-line argument:
-   ```bash
-   cargo run --bin hn-mcp --api-key your_api_key_here stdio
-   ```
-
-Choose the mode that suits your needs:
+The server can be run in different modes:
 
 ### STDIN/STDOUT Mode
 
 This mode is useful when you want to pipe data directly to and from the server:
 
 ```bash
-# Run in STDIN/STDOUT mode with environment variable
-cargo run --bin hn-mcp --api-key $HN_API_KEY stdio
+# Run in STDIN/STDOUT mode
+cargo run stdio
 
 # Run in STDIN/STDOUT mode with debug logging
-cargo run --bin hn-mcp --api-key your_api_key_here stdio --debug
+cargo run stdio --debug
 ```
 
 ### HTTP Mode
@@ -54,13 +41,13 @@ HTTP mode runs an HTTP server with Server-Sent Events (SSE):
 
 ```bash
 # Run in HTTP mode (default address: 0.0.0.0:3000)
-cargo run --bin hn-mcp --api-key $HN_API_KEY http
+cargo run http
 
 # Run in HTTP mode with custom address
-cargo run --bin hn-mcp --api-key your_api_key_here http --address 127.0.0.1:8080
+cargo run http --address 127.0.0.1:8080
 
 # Run in HTTP mode with debug logging
-cargo run --bin hn-mcp --api-key your_api_key_here http --debug
+cargo run http --debug
 ```
 
 ## Command-Line Options
@@ -72,7 +59,6 @@ USAGE:
     hn-mcp [OPTIONS] <SUBCOMMAND>
 
 OPTIONS:
-    -a, --api-key <API_KEY>    HN API key, required if HN_API_KEY environment variable is not set
     -h, --help                 Print help information
     -v, --version              Print version information
 
@@ -110,114 +96,147 @@ OPTIONS:
 An example client is included to demonstrate how to interact with the server:
 
 ```bash
-# If you've set the HN_API_KEY environment variable:
 cargo run --example client
-
-# Or, set it when running the example:
-HN_API_KEY=your_api_key_here cargo run --example client
 ```
 
 The example client demonstrates:
 
 1. STDIN/STDOUT communication with the server
 2. HTTP/SSE communication
-3. Making web search, news search, and local search requests
-4. Handling and parsing of various response formats
+3. Making requests for top stories, latest stories, best stories, etc.
+4. Handling and parsing of story responses
 
 ## Available Tools
 
 The server provides the following tools:
 
-### 1. `hn_web_search`
+### 1. `hn_top_stories`
 
-Performs web searches using the HN Search API.
+Retrieves the top stories from Hacker News.
 
 Parameters:
 
-- `query` (required): The search query (max 400 chars, 50 words)
-- `count` (optional): Number of results to return (1-20, default 10)
-- `offset` (optional): Pagination offset (max 9, default 0)
+- `limit` (optional): Number of stories to return (default: 10, max: 500)
+- `chunk_size` (optional): Number of stories to fetch concurrently (default: 5, range: 1-10)
 
 Example:
 
 ```json
 {
-  "name": "hn_web_search",
+  "name": "hn_top_stories",
   "arguments": {
-    "query": "What is Rust programming?",
-    "count": 5
+    "limit": 5,
+    "chunk_size": 3
   }
 }
 ```
 
-### 2. `hn_news_search`
+### 2. `hn_latest_stories`
 
-Searches for news articles using the HN News Search API.
+Retrieves the latest stories from Hacker News.
 
 Parameters:
 
-- `query` (required): News search query (max 400 chars, 50 words)
-- `count` (optional): Number of results (1-50, default 20)
-- `offset` (optional): Pagination offset (max 9, default 0)
-- `country` (optional): Country code (default US)
-  - Available options: ALL, AR, AU, AT, BE, BR, CA, CL, DK, FI, FR, DE, HK, IN, ID, IT, JP, KR, MY, MX, NL, NZ, NO, CN, PL, PT, PH, RU, SA, ZA, ES, SE, CH, TW, TR, GB, US
-- `search_lang` (optional): Search language (default en)
-  - Available options: ar, eu, bn, bg, ca, zh-hans, zh-hant, hr, cs, da, nl, en, en-gb, et, fi, fr, gl, de, gu, he, hi, hu, is, it, ja, kn, ko, lv, lt, ms, ml, mr, nb, pl, pt, pt-br, pa, ro, ru, sr, sk, sl, es, sv, ta, te, th, tr, uk, vi
-- `freshness` (optional): Timeframe filter (h for hour, d for day, w for week, m for month, y for year)
+- `limit` (optional): Number of stories to return (default: 10, max: 500)
+- `chunk_size` (optional): Number of stories to fetch concurrently (default: 5, range: 1-10)
 
 Example:
 
 ```json
 {
-  "name": "hn_news_search",
+  "name": "hn_latest_stories",
   "arguments": {
-    "query": "AI advancements",
-    "count": 5,
-    "country": "JP",
-    "search_lang": "en",
-    "freshness": "w"
+    "limit": 5
   }
 }
 ```
 
-### 3. `hn_local_search`
+### 3. `hn_best_stories`
 
-Searches for Hacker News content related to specific locations.
+Retrieves the best stories from Hacker News.
 
 Parameters:
 
-- `query` (required): The local search query (e.g., "startups in San Francisco")
-- `count` (optional): Number of results to return (1-20, default 5)
+- `limit` (optional): Number of stories to return (default: 10, max: 500)
+- `chunk_size` (optional): Number of stories to fetch concurrently (default: 5, range: 1-10)
 
 Example:
 
 ```json
 {
-  "name": "hn_local_search",
+  "name": "hn_best_stories",
   "arguments": {
-    "query": "Tech companies in Seattle",
-    "count": 3
+    "limit": 5
+  }
+}
+```
+
+### 4. `hn_ask_stories`
+
+Retrieves Ask HN stories from Hacker News.
+
+Parameters:
+
+- `limit` (optional): Number of stories to return (default: 10, max: 500)
+- `chunk_size` (optional): Number of stories to fetch concurrently (default: 5, range: 1-10)
+
+Example:
+
+```json
+{
+  "name": "hn_ask_stories",
+  "arguments": {
+    "limit": 5
+  }
+}
+```
+
+### 5. `hn_show_stories`
+
+Retrieves Show HN stories from Hacker News.
+
+Parameters:
+
+- `limit` (optional): Number of stories to return (default: 10, max: 500)
+- `chunk_size` (optional): Number of stories to fetch concurrently (default: 5, range: 1-10)
+
+Example:
+
+```json
+{
+  "name": "hn_show_stories",
+  "arguments": {
+    "limit": 5
+  }
+}
+```
+
+### 6. `hn_story_by_id`
+
+Retrieves story details by ID from Hacker News.
+
+Parameters:
+
+- `id` (required): The Hacker News story ID
+
+Example:
+
+```json
+{
+  "name": "hn_story_by_id",
+  "arguments": {
+    "id": 12345
   }
 }
 ```
 
 ## Implementation Notes
 
-- The server implements rate limiting to adhere to API restrictions
-- Local search automatically falls back to web search if no local results are found
-- Results include detailed information where available
-- News search supports comprehensive filtering by country, language, and freshness
-- All tools properly handle API errors and rate limiting with appropriate user feedback
-- API key validation occurs at startup to ensure proper configuration
-
-## Rate Limits
-
-The API has the following rate limits:
-
-- 1 request per second
-- 15,000 requests per month
-
-The server implements these rate limits to prevent exceeding the API quotas.
+- Concurrent processing of story IDs for better performance
+- LRU caching to reduce API calls for frequently requested stories
+- Results include detailed story information where available
+- All tools properly handle API errors with appropriate user feedback
+- Stories are processed in configurable chunks (default: 5, max: 10) to optimize throughput
 
 ## MCP Protocol Integration
 
