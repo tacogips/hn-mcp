@@ -1,4 +1,4 @@
-# CLAUDE.md
+log# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -43,10 +43,11 @@ When making significant changes, update devlog.md to document your work by follo
 
 In this project, the term "documentation" or "project documentation" refers to the following:
 
-- Source code comments and documentation strings
-- CLAUDE.md (this file)
-- spec.md
-- devlog.md
+- Source code comments and documentation strings: Content reflected in rustdoc and similar documentation generators
+- CLAUDE.md (this file): Guidelines and rules for AI agents working with this repository
+- spec.md: Detailed specifications and technical documentation for developers and AI agents
+- devlog.md: Development history documentation for AI agents who will develop the code in the future
+- README.md: Documentation for users of this library or application
 
 When asked to update "documentation", you should check and update all of these documentation sources for consistency.
 
