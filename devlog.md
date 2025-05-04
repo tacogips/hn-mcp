@@ -13,6 +13,19 @@ When making significant changes to the codebase:
 
 ## Recent Changes
 
+### 2025-05-05: Documentation Enhancement - Improved MCP Tool Documentation with Extensive Input/Output Examples
+
+- Enhanced MCP tool documentation for better AI agent usability:
+  - Added detailed descriptions for all Hacker News tools explaining functionality and use cases
+  - Clarified that "HN" is the common abbreviation for "Hacker News" throughout the documentation
+  - Expanded parameter descriptions with examples and usage guidelines
+  - Added comprehensive input/output examples showing exact tool invocations and corresponding results
+  - Included realistic story examples with titles, URLs, scores, and comment counts
+  - Added specific parameter value examples showing effects (e.g., count=3 vs count=25)
+  - Clarified output format information in tool descriptions
+  - Ensured documentation communicates sorting behavior (by score in descending order)
+  - Added cross-referencing between tools (e.g., using IDs from listings in the story_by_id function)
+
 ### 2025-04-24: Performance Improvements - Added LRU Cache for Story Retrieval
 
 - Implemented LRU cache for Hacker News stories to reduce API requests:
@@ -55,7 +68,10 @@ Stories are processed in configurable chunks (default 5, max 10) to avoid overwh
 
 ## Future Improvements
 
-- Add caching to reduce API calls for frequently requested stories
+- ✅ Add caching to reduce API calls for frequently requested stories
+- ✅ Improve tool documentation for better AI agent interaction
 - Implement pagination for large result sets
 - Add error retry logic for transient API failures
 - Expand test coverage for edge cases
+- Add support for more advanced search parameters
+- Add comment retrieval functionality for story discussions
